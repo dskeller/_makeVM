@@ -1,7 +1,7 @@
 ﻿<#
   _makeVM.ps1 (c) 2021 dskeller
 #>
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName="NOInstall")]
 param(
   [Parameter(Mandatory=$true)]
   [string]$vmName,
@@ -31,6 +31,11 @@ param(
 #requires -modules Hyper-ConvertImage
 [void]$(Import-Module Hyper-V)
 [void]$(Import-Module Hyper-ConvertImage)
+
+#Test powershell version as 7 is not working with Hyper-ConvertImage
+if ($PSVersionTable.PSVersion.Major -ne 5){
+  throw "The script can currently only run with Version 5"
+}
 
 #Test specified virtual machine
 if (Get-VM -Name "$vmName"){
