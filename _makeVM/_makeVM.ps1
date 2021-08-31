@@ -1,5 +1,77 @@
 ﻿<#
-  _makeVM.ps1 (c) 2021 dskeller
+  .SYNOPSIS
+    creates hyper-v vm and optional installes OS
+  
+  .DESCRIPTION
+    creates a default VM with empty virtual hard disk
+    Optional installes OS image to virtual hard disk from ISO file with specified answer file.
+
+  .PARAMETER vmName
+  Name of the virtual machine. If VM with same name already exists, script throws error.
+
+  .PARAMETER vmDescription
+  Description of virtual machine. Default is "<vmName> set up at <date>"
+
+  .PARAMETER vmPath
+  Path for new virtual machine. Default takes value from Hyper-V configuration
+
+  .PARAMETER vmMemory
+  Memory of virtual machine. This is set as startup value and max dynamic memory. Default is 4GB
+
+  .PARAMETER vmProcessorcount
+  Number of cores of virtual machine. Default is 4
+
+  .PARAMETER vmSize
+  Size of virtual hard disk. Default is 100GB
+
+  .PARAMETER vmSwitch
+  Name of virtual switch. Default is 'Default Switch'
+
+  .PARAMETER InstallOS
+  Switch to install OS to virtual hard disk. Default is $false
+
+  .PARAMETER isoFile
+  Path to ISO file of new OS
+
+  .PARAMETER ImageName
+  Name of the Image within the ISO file. Query ImageName with Get-WindowsImage
+
+  .PARAMETER AnswerFile
+  Path to Answerfile for OS deployment.
+
+  .INPUTS
+  None. You cannot pipe objects to _makeDC.ps1
+
+  .OUTPUTS
+  None. You get no return of _makeDC.ps1
+
+  .EXAMPLE
+  PS> .\_makeVM.ps1 -vmName "TEST"
+  -> Creates a VM named TEST with 4GB memory, 4 virtual cores, 100GB virtual hard drive with no OS and the virtual Switch "Default Switch" to the default Hyper-V virtual machines location
+  
+  .EXAMPLE
+  PS> .\_makeVM.ps1 `
+  -vmName "TEST" `
+  -vmDescription "TEST Server" `
+  -vmPath "C:\Hyper-V" `
+  -vmMemory 8GB `
+  -vmProcessorcount 8 `
+  -vmSize 250GB `
+  -vmSwitch "vSwitch_TestNet" `
+  -InstallOS `
+  -isoFile "<Path to Install ISO>" `
+  -imageName "Windows Server 2019 Standard (Desktopdarstellung)" 
+  -answerFile "<Path to answer file in xml format>"
+  -> Creates a VM named TEST with the specified parameters and installes OS from ISO with given ImageName and answer file to the newly created virtual hard disk.
+  
+  .FUNCTIONALITY
+  Automatic creation of virtual machine
+
+  .LINK
+  https://docs.microsoft.com/en-us/powershell/module/hyper-v
+
+  .LINK
+  https://github.com/tabs-not-spaces/Hyper-ConvertImage / https://www.powershellgallery.com/packages/Hyper-ConvertImage
 #>
 [CmdletBinding(DefaultParameterSetName="NOInstall")]
 param(
