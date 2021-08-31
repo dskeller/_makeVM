@@ -17,7 +17,7 @@ param(
   [long]$vmSize=100GB,
   [Parameter(Mandatory=$false)]
   [string]$vmSwitch='Default Switch',
-  [Parameter(Mandatory=$false,ParameterSetName="Install")]
+  [Parameter(Mandatory=$true,ParameterSetName="Install")]
   [switch]$InstallOS,
   [Parameter(Mandatory=$true,ParameterSetName="Install")]
   [string]$isoFile,
@@ -33,17 +33,19 @@ param(
 [void]$(Import-Module Hyper-ConvertImage)
 
 #Test powershell version as 7 is not working with Hyper-ConvertImage
-if ($PSVersionTable.PSVersion.Major -ne 5){
+if ($PSVersionTable.PSVersion.Major -ne 5)
+{
   throw "The script can currently only run with Version 5"
 }
 
 #Test specified virtual machine
-if (Get-VM -Name "$vmName"){
+if (Get-VM -Name "$vmName" -ErrorAction SilentlyContinue)
+{
   throw "A VM with the specified Name already exist."
 }
 
 #Test specified virtual switch
-if (-not (Get-VMSwitch -Name "$vmSwitch"))
+if (-not (Get-VMSwitch -Name "$vmSwitch" -ErrorAction SilentlyContinue))
 {
   throw "The specifed virtual switch does not exist."
 }
@@ -72,8 +74,9 @@ Write-Verbose -Message "Changing settings of '$vmName'..."
 #just some magic to get a mac adress from the hyper-v address space for newly created virtual machine
 Write-Verbose -Message "Changing to static MAC Address..."
 [void]$(Start-VM -Name "$vmName")
-[void]$(Start-Sleep -Seconds 2)
+[void]$(Start-Sleep -Seconds 5)
 [void]$(Stop-VM -Name "$vmName" -TurnOff -Force)
+[void]$(Start-Sleep -Seconds 5)
 $virtNIC = Get-VMNetworkAdapter -VMName $vmName
 [void]$($virtNIC | Set-VMNetworkAdapter -StaticMacAddress $virtNIC.MacAddress)
 
